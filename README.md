@@ -1,6 +1,8 @@
 Short URL
 ==
 
+URL shortening webservice with REST API for URL management. 
+
 ## Frontend
 
 `GET:/`
@@ -79,3 +81,4 @@ Redirects to respective URL
     - `MYSQL_PASS` MySQL user password
     - `MYSQL_PORT` MySQL service TCP port
 - `GIN_MODE` Default is debug mode. For production environment set to `release`
+- `SHARED_TOKEN` Shared token for authentication
