@@ -3,11 +3,30 @@ Short URL
 
 URL shortening webservice with REST API for URL management. 
 
-## Frontend
+## Set up as docker container
+
+Create environment file by copying distribution configuration:
+
+```shell
+cp .env.dist .env
+```
+Adjust parameters according to your environment.
+
+Build and run image.
+
+```shell
+docker build -t shorturl .
+docker run --rm -i --env-file ./.env -p8080:8080 shorturl
+```
+
+Please note that in this example container is removed as soon as it is stopped (option `--rm`). 
+This example assumes than application listens on port `8080` (environment parameter `LISTEN_ADDR`).
+
+## Frontend (in development)
 
 `GET:/`
 
-Public SPA where user can create shortened URL as well as get report on particular URL. 
+Public SPA where user can create shortened URL as well as get report on particular URL.  
 
 ## API
 Authenticaiton using preshared key provided via header `Authorization`.
