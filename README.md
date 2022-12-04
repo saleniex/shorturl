@@ -101,3 +101,9 @@ Redirects to respective URL
     - `MYSQL_PORT` MySQL service TCP port
 - `GIN_MODE` Default is debug mode. For production environment set to `release`
 - `SHARED_TOKEN` Shared token for authentication
+
+## Tests
+
+```shell
+go test -v ./...
+```
