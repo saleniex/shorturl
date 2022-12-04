@@ -21,9 +21,16 @@ func HandleViewUrl(e *gin.Engine, repo repo.ShortUrlRepo) {
 			return
 		}
 
+		stats, statsErr := repo.ShortUrlAccessStats(uri.ShortId)
+		if statsErr != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"errorMessage": statsErr})
+			return
+		}
+
 		context.JSON(http.StatusOK, gin.H{
-			"id":         uri.ShortId,
-			"shortIdUri": repo.Find(uri.ShortId),
+			"id":          uri.ShortId,
+			"shortIdUri":  repo.Find(uri.ShortId),
+			"accessCount": stats.Count,
 		})
 	})
 }

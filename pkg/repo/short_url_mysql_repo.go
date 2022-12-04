@@ -57,3 +57,59 @@ func (s ShortUrlMysqlRepo) Find(shortId string) string {
 
 	return shortUrl.Url
 }
+
+func (s ShortUrlMysqlRepo) LogAccess(shortId, remoteIp string) error {
+	con, err := sql.Open("mysql", s.dsn)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = con.Close()
+	}()
+	_, err = con.Exec(
+		`
+			INSERT INTO access_log (created_at, shorturl_id, ip)
+			SELECT
+				NOW() AS created_at,
+				id AS shorturl_id,
+				? AS ip
+			FROM shorturl
+			WHERE short_id = ?`,
+		remoteIp, shortId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type queryResult struct {
+	AccessCount int `json:"access_count"`
+}
+
+func (s ShortUrlMysqlRepo) ShortUrlAccessStats(shortId string) (*AccessStats, error) {
+	con, err := sql.Open("mysql", s.dsn)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = con.Close()
+	}()
+	row := con.QueryRow(
+		`
+			SELECT COUNT(*) access_count
+			FROM access_log l
+				LEFT JOIN shorturl s ON l.shorturl_id = s.id
+			WHERE s.short_id = ?;`,
+		shortId)
+
+	var queryResult queryResult
+	scanErr := row.Scan(&queryResult.AccessCount)
+	if scanErr != nil {
+		return nil, scanErr
+	}
+	stats := AccessStats{
+		Count: queryResult.AccessCount,
+	}
+	return &stats, nil
+}

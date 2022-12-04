@@ -18,6 +18,9 @@ func HandleRedirect(e *gin.Engine, repo repo.ShortUrlRepo) {
 			context.Status(http.StatusNotFound)
 			return
 		}
+
+		_ = repo.LogAccess(uri.ShortId, context.ClientIP())
+
 		context.Redirect(http.StatusFound, url)
 	})
 }
