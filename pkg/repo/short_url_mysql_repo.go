@@ -9,6 +9,16 @@ import (
 
 type ShortUrlMysqlRepo struct {
 	dsn string
+	con *sql.DB
+}
+
+type queryResult struct {
+	AccessCount int `json:"access_count"`
+}
+
+type shortUrl struct {
+	ShortId string `json:"short_id"`
+	Url     string `json:"Url"`
 }
 
 func NewShortUrlMysqlRepo(user, pass, host, dbname string, port int) ShortUrlMysqlRepo {
@@ -17,14 +27,11 @@ func NewShortUrlMysqlRepo(user, pass, host, dbname string, port int) ShortUrlMys
 	}
 }
 
-func (s ShortUrlMysqlRepo) StoreUrl(shortUrl app.ShortUrl) error {
-	con, err := sql.Open("mysql", s.dsn)
+func (s *ShortUrlMysqlRepo) StoreUrl(shortUrl app.ShortUrl) error {
+	con, err := s.Connection()
 	if err != nil {
 		return err
 	}
-	defer func() {
-		_ = con.Close()
-	}()
 	_, err = con.Query(
 		"INSERT INTO shorturl (short_id, Url, created_at) VALUES (?,?,NOW())",
 		shortUrl.ShortId,
@@ -35,19 +42,12 @@ func (s ShortUrlMysqlRepo) StoreUrl(shortUrl app.ShortUrl) error {
 	return nil
 }
 
-type shortUrl struct {
-	ShortId string `json:"short_id"`
-	Url     string `json:"Url"`
-}
-
-func (s ShortUrlMysqlRepo) Find(shortId string) string {
-	con, err := sql.Open("mysql", s.dsn)
+func (s *ShortUrlMysqlRepo) Find(shortId string) string {
+	con, err := s.Connection()
 	if err != nil {
 		return ""
 	}
-	defer func() {
-		_ = con.Close()
-	}()
+
 	row := con.QueryRow("SELECT Url FROM shorturl WHERE short_id = ?", shortId)
 	var shortUrl shortUrl
 	err = row.Scan(&shortUrl.Url)
@@ -58,14 +58,11 @@ func (s ShortUrlMysqlRepo) Find(shortId string) string {
 	return shortUrl.Url
 }
 
-func (s ShortUrlMysqlRepo) LogAccess(shortId, remoteIp string) error {
-	con, err := sql.Open("mysql", s.dsn)
+func (s *ShortUrlMysqlRepo) LogAccess(shortId, remoteIp string) error {
+	con, err := s.Connection()
 	if err != nil {
 		return err
 	}
-	defer func() {
-		_ = con.Close()
-	}()
 	_, err = con.Exec(
 		`
 			INSERT INTO access_log (created_at, shorturl_id, ip)
@@ -83,18 +80,11 @@ func (s ShortUrlMysqlRepo) LogAccess(shortId, remoteIp string) error {
 	return nil
 }
 
-type queryResult struct {
-	AccessCount int `json:"access_count"`
-}
-
-func (s ShortUrlMysqlRepo) ShortUrlAccessStats(shortId string) (*AccessStats, error) {
-	con, err := sql.Open("mysql", s.dsn)
+func (s *ShortUrlMysqlRepo) ShortUrlAccessStats(shortId string) (*AccessStats, error) {
+	con, err := s.Connection()
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = con.Close()
-	}()
 	row := con.QueryRow(
 		`
 			SELECT COUNT(*) access_count
@@ -112,4 +102,19 @@ func (s ShortUrlMysqlRepo) ShortUrlAccessStats(shortId string) (*AccessStats, er
 		Count: queryResult.AccessCount,
 	}
 	return &stats, nil
+}
+
+func (s *ShortUrlMysqlRepo) Connection() (*sql.DB, error) {
+	if s.con == nil {
+		con, err := sql.Open("mysql", s.dsn)
+		if err != nil {
+			return nil, err
+		}
+		s.con = con
+	}
+	if err := s.con.Ping(); err != nil {
+		return nil, err
+	}
+
+	return s.con, nil
 }
