@@ -107,3 +107,9 @@ Redirects to respective URL
 ```shell
 go test -v ./...
 ```
+
+## Planned features
+
+- Database initialization
+- Redis cache
+- New URL add and redirect stats via RabbitMQ
