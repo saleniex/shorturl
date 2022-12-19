@@ -1,16 +1,10 @@
-package repo
+package shorturl
 
 import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"shorturl/pkg/app"
 )
-
-type ShortUrlMysqlRepo struct {
-	dsn string
-	con *sql.DB
-}
 
 type queryResult struct {
 	AccessCount int `json:"access_count"`
@@ -21,13 +15,18 @@ type shortUrl struct {
 	Url     string `json:"Url"`
 }
 
-func NewShortUrlMysqlRepo(user, pass, host, dbname string, port int) ShortUrlMysqlRepo {
-	return ShortUrlMysqlRepo{
+type MysqlRepo struct {
+	dsn string
+	con *sql.DB
+}
+
+func NewMysqlRepo(user, pass, host, dbname string, port int) MysqlRepo {
+	return MysqlRepo{
 		dsn: fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", user, pass, host, port, dbname),
 	}
 }
 
-func (s *ShortUrlMysqlRepo) StoreUrl(shortUrl app.ShortUrl) error {
+func (s *MysqlRepo) StoreUrl(shortUrl ShortUrl) error {
 	con, err := s.Connection()
 	if err != nil {
 		return err
@@ -42,7 +41,7 @@ func (s *ShortUrlMysqlRepo) StoreUrl(shortUrl app.ShortUrl) error {
 	return nil
 }
 
-func (s *ShortUrlMysqlRepo) Find(shortId string) string {
+func (s *MysqlRepo) Find(shortId string) string {
 	con, err := s.Connection()
 	if err != nil {
 		return ""
@@ -58,7 +57,7 @@ func (s *ShortUrlMysqlRepo) Find(shortId string) string {
 	return shortUrl.Url
 }
 
-func (s *ShortUrlMysqlRepo) LogAccess(shortId, remoteIp string) error {
+func (s *MysqlRepo) LogAccess(shortId, remoteIp string) error {
 	con, err := s.Connection()
 	if err != nil {
 		return err
@@ -80,7 +79,7 @@ func (s *ShortUrlMysqlRepo) LogAccess(shortId, remoteIp string) error {
 	return nil
 }
 
-func (s *ShortUrlMysqlRepo) ShortUrlAccessStats(shortId string) (*AccessStats, error) {
+func (s *MysqlRepo) ShortUrlAccessStats(shortId string) (*AccessStats, error) {
 	con, err := s.Connection()
 	if err != nil {
 		return nil, err
@@ -104,7 +103,7 @@ func (s *ShortUrlMysqlRepo) ShortUrlAccessStats(shortId string) (*AccessStats, e
 	return &stats, nil
 }
 
-func (s *ShortUrlMysqlRepo) Connection() (*sql.DB, error) {
+func (s *MysqlRepo) Connection() (*sql.DB, error) {
 	if s.con == nil {
 		con, err := sql.Open("mysql", s.dsn)
 		if err != nil {

@@ -1,15 +1,15 @@
-package handlers
+package handler
 
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"shorturl/pkg/repo"
+	"shorturl/internal/shorturl"
 )
 
 // HandleViewUrl handles request for GET /view/:id
-func HandleViewUrl(e *gin.Engine, repo repo.ShortUrlRepo) {
+func HandleViewUrl(e *gin.Engine, repo shorturl.Repository) {
 	e.GET("/view/:id", func(context *gin.Context) {
-		var uri ShortIdUri
+		var uri shorturl.ShortIdUri
 		if err := context.ShouldBindUri(&uri); err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"errorMessage": err})
 			return

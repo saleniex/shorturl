@@ -1,17 +1,16 @@
-package repo
+package shorturl
 
 import (
-	"shorturl/pkg/app"
 	"testing"
 )
 
 func TestStoreFind(t *testing.T) {
 	r := NewShortUrlMemRepo()
-	_ = r.StoreUrl(app.ShortUrl{
+	_ = r.StoreUrl(ShortUrl{
 		Url:     "_URL_01_",
 		ShortId: "_SHORT_ID_01_",
 	})
-	_ = r.StoreUrl(app.ShortUrl{
+	_ = r.StoreUrl(ShortUrl{
 		Url:     "_URL_02_",
 		ShortId: "_SHORT_ID_02_",
 	})

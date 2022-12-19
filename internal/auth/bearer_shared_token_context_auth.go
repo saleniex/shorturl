@@ -3,7 +3,7 @@ package auth
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"shorturl/pkg/params"
+	"shorturl/internal/params"
 	"strings"
 )
 

@@ -1,4 +1,4 @@
-package app
+package shorturl
 
 type ShortUrl struct {
 	Url     string `json:"url"`

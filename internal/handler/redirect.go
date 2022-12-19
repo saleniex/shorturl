@@ -1,14 +1,14 @@
-package handlers
+package handler
 
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"shorturl/pkg/repo"
+	"shorturl/internal/shorturl"
 )
 
-func HandleRedirect(e *gin.Engine, repo repo.ShortUrlRepo) {
+func HandleRedirect(e *gin.Engine, repo shorturl.Repository) {
 	e.GET("/go/:id", func(context *gin.Context) {
-		var uri ShortIdUri
+		var uri shorturl.ShortIdUri
 		if err := context.ShouldBindUri(&uri); err != nil {
 			context.Status(http.StatusBadRequest)
 			return
