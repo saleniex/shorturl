@@ -29,10 +29,10 @@ This example assumes than application listens on port `8080` (environment parame
 Public SPA where user can create shortened URL as well as get report on particular URL.  
 
 ## API
-Authenticaiton using preshared key provided via header `Authorization`.
+Authentication using pre-shared key provided via header `Authorization`.
 
 ```text
-Authorization: bearer _preshared_token_
+Authorization: bearer _pre-shared_token_
 ```
 
 ### Add URL
