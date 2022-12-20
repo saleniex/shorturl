@@ -11,7 +11,7 @@ import (
 //
 // Content type is expected to be "application/json" while body contains JSON object with two parameters:
 // "url" and "shortId"
-func HandleAddUrl(engine *gin.Engine, urlRepo shorturl.Repository, auth auth.ContextAuth) {
+func HandleAddUrl(engine *gin.Engine, urlRepo shorturl.Repo, auth auth.ContextAuth) {
 	engine.POST("/", func(context *gin.Context) {
 		if err := auth.Authorize(context); err != nil {
 			context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{

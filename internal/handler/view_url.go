@@ -7,7 +7,7 @@ import (
 )
 
 // HandleViewUrl handles request for GET /view/:id
-func HandleViewUrl(e *gin.Engine, repo shorturl.Repository) {
+func HandleViewUrl(e *gin.Engine, repo shorturl.Repo) {
 	e.GET("/view/:id", func(context *gin.Context) {
 		var uri shorturl.ShortIdUri
 		if err := context.ShouldBindUri(&uri); err != nil {
@@ -23,7 +23,7 @@ func HandleViewUrl(e *gin.Engine, repo shorturl.Repository) {
 
 		stats, statsErr := repo.ShortUrlAccessStats(uri.ShortId)
 		if statsErr != nil {
-			context.JSON(http.StatusBadRequest, gin.H{"errorMessage": statsErr})
+			context.JSON(http.StatusBadRequest, gin.H{"errorMessage": statsErr.Error()})
 			return
 		}
 

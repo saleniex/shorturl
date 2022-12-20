@@ -7,9 +7,10 @@ import (
 
 const TypeMemory string = "MEMORY"
 const TypeMysql string = "MYSQL"
+const TypeRedis string = "REDIS"
 
-// Repository interface provides contract for repository to store short URL mapping
-type Repository interface {
+// Repo interface provides contract for repository to store short URL mapping
+type Repo interface {
 	// StoreUrl stores URL with given shortID
 	//
 	// Returns error != nil in case ShortId is already used or Url provided is invalid
@@ -29,12 +30,12 @@ type Repository interface {
 	ShortUrlAccessStats(shortId string) (*AccessStats, error)
 }
 
-func NewRepo(parameters params.Params) Repository {
+func NewRepo(parameters params.Params) Repo {
 	repoType := parameters.GetWithDefault(params.Repository, TypeMemory)
 
 	switch repoType {
 	case TypeMemory:
-		repo := NewShortUrlMemRepo()
+		repo := NewMemRepo()
 		return &repo
 
 	case TypeMysql:
@@ -45,6 +46,9 @@ func NewRepo(parameters params.Params) Repository {
 			parameters.Get("MYSQL_DBNAME"),
 			parameters.GetIntWithDefault("MYSQL_PORT", 3306))
 		return &repo
+
+	case TypeRedis:
+		return NewRedisRepo(parameters.Get("REDIS_HOST"))
 
 	default:
 		panic(fmt.Sprintf("unsupported repository '%s'", repoType))

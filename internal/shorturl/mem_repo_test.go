@@ -5,7 +5,7 @@ import (
 )
 
 func TestStoreFind(t *testing.T) {
-	r := NewShortUrlMemRepo()
+	r := NewMemRepo()
 	_ = r.StoreUrl(ShortUrl{
 		Url:     "_URL_01_",
 		ShortId: "_SHORT_ID_01_",

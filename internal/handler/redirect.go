@@ -6,7 +6,7 @@ import (
 	"shorturl/internal/shorturl"
 )
 
-func HandleRedirect(e *gin.Engine, repo shorturl.Repository) {
+func HandleRedirect(e *gin.Engine, repo shorturl.Repo) {
 	e.GET("/go/:id", func(context *gin.Context) {
 		var uri shorturl.ShortIdUri
 		if err := context.ShouldBindUri(&uri); err != nil {
