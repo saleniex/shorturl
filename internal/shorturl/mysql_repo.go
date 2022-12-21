@@ -20,8 +20,8 @@ type MysqlRepo struct {
 	con *sql.DB
 }
 
-func NewMysqlRepo(user, pass, host, dbname string, port int) MysqlRepo {
-	return MysqlRepo{
+func NewMysqlRepo(user, pass, host, dbname string, port int) *MysqlRepo {
+	return &MysqlRepo{
 		dsn: fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", user, pass, host, port, dbname),
 	}
 }

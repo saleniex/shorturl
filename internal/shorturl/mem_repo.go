@@ -13,8 +13,8 @@ type MemoryRepo struct {
 	access map[string]map[string]int
 }
 
-func NewMemRepo() MemoryRepo {
-	return MemoryRepo{
+func NewMemRepo() *MemoryRepo {
+	return &MemoryRepo{
 		urls: make(map[string]string),
 	}
 }

@@ -8,6 +8,7 @@ import (
 const TypeMemory string = "MEMORY"
 const TypeMysql string = "MYSQL"
 const TypeRedis string = "REDIS"
+const TypeCachedMySql string = "CACHED_MYSQL"
 
 // Repo interface provides contract for repository to store short URL mapping
 type Repo interface {
@@ -30,27 +31,37 @@ type Repo interface {
 	ShortUrlAccessStats(shortId string) (*AccessStats, error)
 }
 
+// NewRepo creates repository using provided parameters
 func NewRepo(parameters params.Params) Repo {
 	repoType := parameters.GetWithDefault(params.Repository, TypeMemory)
 
 	switch repoType {
 	case TypeMemory:
-		repo := NewMemRepo()
-		return &repo
+		return NewMemRepo()
 
 	case TypeMysql:
-		repo := NewMysqlRepo(
-			parameters.Get("MYSQL_USER"),
-			parameters.Get("MYSQL_PASS"),
-			parameters.Get("MYSQL_HOST"),
-			parameters.Get("MYSQL_DBNAME"),
-			parameters.GetIntWithDefault("MYSQL_PORT", 3306))
-		return &repo
+		return newMySqlRepo(parameters)
 
 	case TypeRedis:
-		return NewRedisRepo(parameters.Get("REDIS_HOST"))
+		return newRedisRepo(parameters)
+
+	case TypeCachedMySql:
+		return NewCachedRepo(newMySqlRepo(parameters), newRedisRepo(parameters))
 
 	default:
 		panic(fmt.Sprintf("unsupported repository '%s'", repoType))
 	}
+}
+
+func newMySqlRepo(params params.Params) *MysqlRepo {
+	return NewMysqlRepo(
+		params.Get("MYSQL_USER"),
+		params.Get("MYSQL_PASS"),
+		params.Get("MYSQL_HOST"),
+		params.Get("MYSQL_DBNAME"),
+		params.GetIntWithDefault("MYSQL_PORT", 3306))
+}
+
+func newRedisRepo(params params.Params) *RedisRepo {
+	return NewRedisRepo(params.Get("REDIS_HOST"))
 }

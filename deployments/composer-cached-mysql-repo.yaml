@@ -1,0 +1,20 @@
+version: "3.3"
+
+services:
+  redis_server:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  app:
+    build:
+      context: ..
+      dockerfile: deployments/Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - ../.env
+    environment:
+      - LISTEN_ADDR=:8080
+      - REDIS_HOST=redis_server:6379
+      - REPOSITORY=CACHED_MYSQL
