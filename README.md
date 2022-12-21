@@ -109,7 +109,7 @@ go test -v ./...
 ```
 
 ## Planned features
-
+- ~~Redis repository~~
 - Database initialization
 - Redis cache
 - New URL add and redirect stats via RabbitMQ
