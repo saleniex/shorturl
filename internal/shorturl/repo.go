@@ -5,10 +5,12 @@ import (
 	"shorturl/internal/params"
 )
 
-const TypeMemory string = "MEMORY"
-const TypeMysql string = "MYSQL"
-const TypeRedis string = "REDIS"
-const TypeCachedMySql string = "CACHED_MYSQL"
+const (
+	TypeMemory      string = "MEMORY"
+	TypeMysql       string = "MYSQL"
+	TypeRedis       string = "REDIS"
+	TypeCachedMySql string = "CACHED_MYSQL"
+)
 
 // Repo interface provides contract for repository to store short URL mapping
 type Repo interface {
