@@ -101,6 +101,7 @@ Redirects to respective URL
     - `MYSQL_PORT` MySQL service TCP port
 - `GIN_MODE` Default is debug mode. For production environment set to `release`
 - `SHARED_TOKEN` Shared token for authentication
+- `REDIS_HOST` Redis host along with port number (localhost:6379). Relevant for repositories `REDIS`, `CACHED_MYSQL`.
 
 ## Tests
 
