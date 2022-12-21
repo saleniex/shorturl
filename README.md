@@ -70,8 +70,9 @@ Authorization: bearer _pre-shared_token_
 
 ```json
 {
-  "clickCount": 0,
-  "uniqueClickCount": 0
+  "accessCount": 3,
+  "id": "id",
+  "shortIdUri": "https://go.to.address.net"
 }
 ```
 
