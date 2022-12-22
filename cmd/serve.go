@@ -1,8 +1,9 @@
-package main
+package cmd
 
 import (
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"shorturl/internal/auth"
 	"shorturl/internal/handler"
@@ -11,7 +12,7 @@ import (
 	"time"
 )
 
-func main() {
+func ServeCmd(cmd *cobra.Command, args []string) {
 	parameters := params.NewEnvParams()
 	engine := gin.Default()
 	shortUrlRepo := shorturl.NewRepo(parameters)
