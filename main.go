@@ -3,10 +3,17 @@ package main
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
 	"shorturl/cmd"
+	"shorturl/internal/params"
 )
 
 func main() {
+	param := params.NewEnvParams()
+	logger, logErr := zap.NewProduction()
+	if logErr != nil {
+		panic(fmt.Sprintf("cannot fire-up logger: %s", logErr))
+	}
 	rootCmd := &cobra.Command{
 		Use:   "shorturl",
 		Short: "Short URL service",
@@ -18,7 +25,7 @@ func main() {
 		Use:   "serve",
 		Short: "Serve web service",
 		Long:  "Application wbe service and API",
-		Run:   cmd.ServeCmd,
+		Run:   cmd.NewServeCmd(param, logger).Exec,
 	}
 	rootCmd.AddCommand(serveCmd)
 
@@ -26,7 +33,7 @@ func main() {
 		Use:   "consume-stats",
 		Short: "AMQP stats consumer",
 		Long:  "Consume URL access stats sent via AMQP",
-		Run:   cmd.ConsumeStatsCmd,
+		Run:   cmd.NewConsumeStatsCmd(param, logger).Exec,
 	}
 	rootCmd.AddCommand(consumeStatsCmd)
 

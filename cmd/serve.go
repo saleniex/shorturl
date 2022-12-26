@@ -12,23 +12,33 @@ import (
 	"time"
 )
 
-func ServeCmd(cmd *cobra.Command, args []string) {
-	parameters := params.NewEnvParams()
-	engine := gin.Default()
-	shortUrlRepo := shorturl.NewRepo(parameters)
-	contextAuth := auth.NewBearerSharedTokenContextAuth(parameters)
+type ServeCmd struct {
+	params params.Params
+	logger *zap.Logger
+}
 
-	logger, _ := zap.NewProduction()
-	engine.Use(ginzap.Ginzap(logger, time.RFC3339, true))
-	engine.Use(ginzap.RecoveryWithZap(logger, true))
+func NewServeCmd(params params.Params, logger *zap.Logger) *ServeCmd {
+	return &ServeCmd{
+		params: params,
+		logger: logger,
+	}
+}
+
+func (sc ServeCmd) Exec(_ *cobra.Command, _ []string) {
+	engine := gin.Default()
+	shortUrlRepo := shorturl.NewRepo(sc.params)
+	contextAuth := auth.NewBearerSharedTokenContextAuth(sc.params)
+
+	engine.Use(ginzap.Ginzap(sc.logger, time.RFC3339, true))
+	engine.Use(ginzap.RecoveryWithZap(sc.logger, true))
 
 	handler.HandleIndex(engine)
 	handler.HandleAddUrl(engine, shortUrlRepo, contextAuth)
 	handler.HandleViewUrl(engine, shortUrlRepo)
 	handler.HandleRedirect(engine, shortUrlRepo)
 
-	listenAddr := parameters.GetWithDefault(params.ListenAddr, ":8080")
+	listenAddr := sc.params.GetWithDefault(params.ListenAddr, ":8080")
 	if err := engine.Run(listenAddr); err != nil {
-		logger.Error("Server start failed", zap.Error(err))
+		sc.logger.Error("Server start failed", zap.Error(err))
 	}
 }
