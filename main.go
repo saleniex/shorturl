@@ -6,6 +6,7 @@ import (
 	"go.uber.org/zap"
 	"shorturl/cmd"
 	"shorturl/internal/params"
+	"shorturl/internal/shorturl"
 )
 
 func main() {
@@ -14,6 +15,8 @@ func main() {
 	if logErr != nil {
 		panic(fmt.Sprintf("cannot fire-up logger: %s", logErr))
 	}
+	shortUrlRepo := shorturl.NewRepo(param)
+
 	rootCmd := &cobra.Command{
 		Use:   "shorturl",
 		Short: "Short URL service",
@@ -25,7 +28,7 @@ func main() {
 		Use:   "serve",
 		Short: "Serve web service",
 		Long:  "Application wbe service and API",
-		Run:   cmd.NewServeCmd(param, logger).Exec,
+		Run:   cmd.NewServeCmd(param, logger, shortUrlRepo).Exec,
 	}
 	rootCmd.AddCommand(serveCmd)
 

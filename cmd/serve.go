@@ -15,27 +15,28 @@ import (
 type ServeCmd struct {
 	params params.Params
 	logger *zap.Logger
+	repo   shorturl.Repo
 }
 
-func NewServeCmd(params params.Params, logger *zap.Logger) *ServeCmd {
+func NewServeCmd(params params.Params, logger *zap.Logger, repo shorturl.Repo) *ServeCmd {
 	return &ServeCmd{
 		params: params,
 		logger: logger,
+		repo:   repo,
 	}
 }
 
 func (sc ServeCmd) Exec(_ *cobra.Command, _ []string) {
 	engine := gin.Default()
-	shortUrlRepo := shorturl.NewRepo(sc.params)
 	contextAuth := auth.NewBearerSharedTokenContextAuth(sc.params)
 
 	engine.Use(ginzap.Ginzap(sc.logger, time.RFC3339, true))
 	engine.Use(ginzap.RecoveryWithZap(sc.logger, true))
 
 	handler.HandleIndex(engine)
-	handler.HandleAddUrl(engine, shortUrlRepo, contextAuth)
-	handler.HandleViewUrl(engine, shortUrlRepo)
-	handler.HandleRedirect(engine, shortUrlRepo)
+	handler.HandleAddUrl(engine, sc.repo, contextAuth)
+	handler.HandleViewUrl(engine, sc.repo)
+	handler.HandleRedirect(engine, sc.repo)
 
 	listenAddr := sc.params.GetWithDefault(params.ListenAddr, ":8080")
 	if err := engine.Run(listenAddr); err != nil {
