@@ -37,4 +37,6 @@ func (csc ConsumeStatsCmd) Exec(_ *cobra.Command, _ []string) {
 
 func (csc ConsumeStatsCmd) consumeCallback(_ string) {
 	// assume string is shortId so bump up access counter for this short id
+	// TODO implement consume-stats consume callback
+	csc.logger.Error("consume stats command is not implemented yet. no stats are collected.")
 }
