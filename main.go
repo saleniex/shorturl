@@ -36,11 +36,11 @@ func main() {
 		Use:   "consume-stats",
 		Short: "AMQP stats consumer",
 		Long:  "Consume URL access stats sent via AMQP",
-		Run:   cmd.NewConsumeStatsCmd(param, logger).Exec,
+		Run:   cmd.NewConsumeStatsCmd(param, logger, shortUrlRepo).Exec,
 	}
 	rootCmd.AddCommand(consumeStatsCmd)
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Printf("Error %s", err)
+		logger.Fatal("Error while firing up command", zap.Error(err))
 	}
 }

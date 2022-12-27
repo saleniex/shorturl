@@ -15,8 +15,8 @@ type Queue struct {
 }
 
 // NewQueue creates new queue instance on given channel with given name
-func NewQueue(channel *Channel, queueName string) Queue {
-	return Queue{
+func NewQueue(channel *Channel, queueName string) *Queue {
+	return &Queue{
 		channel:   channel,
 		queueName: queueName,
 	}

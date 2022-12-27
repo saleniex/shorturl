@@ -2,6 +2,7 @@ package shorturl
 
 import (
 	"fmt"
+	"shorturl/internal/amqp"
 	"shorturl/internal/params"
 )
 
@@ -10,6 +11,7 @@ const (
 	TypeMysql       string = "MYSQL"
 	TypeRedis       string = "REDIS"
 	TypeCachedMySql string = "CACHED_MYSQL"
+	TypeDistributed string = "DISTRIBUTED"
 )
 
 // Repo interface provides contract for repository to store short URL mapping
@@ -48,7 +50,10 @@ func NewRepo(parameters params.Params) Repo {
 		return newRedisRepo(parameters)
 
 	case TypeCachedMySql:
-		return NewCachedRepo(newMySqlRepo(parameters), newRedisRepo(parameters))
+		return newCachedRepo(parameters)
+
+	case TypeDistributed:
+		return NewDistributedRepo(newCachedRepo(parameters), newQueue(parameters))
 
 	default:
 		panic(fmt.Sprintf("unsupported repository '%s'", repoType))
@@ -66,4 +71,13 @@ func newMySqlRepo(params params.Params) *MysqlRepo {
 
 func newRedisRepo(params params.Params) *RedisRepo {
 	return NewRedisRepo(params.Get("REDIS_HOST"))
+}
+
+func newCachedRepo(params params.Params) *CachedRepo {
+	return NewCachedRepo(newMySqlRepo(params), newRedisRepo(params))
+}
+
+func newQueue(params params.Params) *amqp.Queue {
+	channel := amqp.NewChannel(params.Get("AMQP_URL"))
+	return amqp.NewQueue(channel, params.Get("AMQP_QUEUE_NAME"))
 }
