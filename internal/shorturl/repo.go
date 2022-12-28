@@ -79,5 +79,5 @@ func newCachedRepo(params params.Params) *CachedRepo {
 
 func newQueue(params params.Params) *amqp.Queue {
 	channel := amqp.NewChannel(params.Get("AMQP_URL"))
-	return amqp.NewQueue(channel, params.Get("AMQP_QUEUE_NAME"))
+	return amqp.NewQueue(channel, params.GetWithDefault("AMQP_QUEUE_NAME", amqp.DefaultQueueName))
 }

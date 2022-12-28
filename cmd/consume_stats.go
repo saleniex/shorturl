@@ -16,8 +16,6 @@ type ConsumeStatsCmd struct {
 	repo   shorturl.Repo
 }
 
-var defaultQueueName = "shorturl_stats"
-
 func NewConsumeStatsCmd(params params.Params, logger *zap.Logger, repo shorturl.Repo) *ConsumeStatsCmd {
 	return &ConsumeStatsCmd{
 		params: params,
@@ -28,7 +26,7 @@ func NewConsumeStatsCmd(params params.Params, logger *zap.Logger, repo shorturl.
 
 func (csc ConsumeStatsCmd) Exec(_ *cobra.Command, _ []string) {
 	channel := amqp.NewChannel(csc.params.Get("AMQP_URL"))
-	queue := amqp.NewQueue(channel, csc.params.GetWithDefault("AMQP_QUEUE_NAME", defaultQueueName))
+	queue := amqp.NewQueue(channel, csc.params.GetWithDefault("AMQP_QUEUE_NAME", amqp.DefaultQueueName))
 
 	var forever chan struct{}
 	failCount := 0

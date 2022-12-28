@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+var DefaultQueueName = "shorturl_stats"
+
 // Queue represents AMQP queue
 type Queue struct {
 	queueName string
