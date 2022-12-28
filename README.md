@@ -116,4 +116,4 @@ go test -v ./...
 - ~~Redis repository~~
 - Database initialization
 - ~~Redis cache~~
-- New URL add and redirect stats via RabbitMQ
+- ~~New URL add and redirect stats via RabbitMQ~~
