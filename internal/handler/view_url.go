@@ -6,31 +6,38 @@ import (
 	"shorturl/internal/shorturl"
 )
 
-// HandleViewUrl handles request for GET /view/:id
-func HandleViewUrl(e *gin.Engine, repo shorturl.Repo) {
-	e.GET("/view/:id", func(context *gin.Context) {
-		var uri shorturl.ShortIdUri
-		if err := context.ShouldBindUri(&uri); err != nil {
-			context.JSON(http.StatusBadRequest, gin.H{"errorMessage": err})
-			return
-		}
+type ViewUlr struct {
+	repo shorturl.Repo
+}
 
-		url := repo.Find(uri.ShortId)
-		if url == "" {
-			context.Status(http.StatusNotFound)
-			return
-		}
+func NewViewUrl(repo shorturl.Repo) *ViewUlr {
+	return &ViewUlr{
+		repo: repo,
+	}
+}
 
-		stats, statsErr := repo.ShortUrlAccessStats(uri.ShortId)
-		if statsErr != nil {
-			context.JSON(http.StatusBadRequest, gin.H{"errorMessage": statsErr.Error()})
-			return
-		}
+func (u ViewUlr) Handle(context *gin.Context) {
+	var uri shorturl.ShortIdUri
+	if err := context.ShouldBindUri(&uri); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"errorMessage": err})
+		return
+	}
 
-		context.JSON(http.StatusOK, gin.H{
-			"id":          uri.ShortId,
-			"shortIdUri":  repo.Find(uri.ShortId),
-			"accessCount": stats.Count,
-		})
+	url := u.repo.Find(uri.ShortId)
+	if url == "" {
+		context.Status(http.StatusNotFound)
+		return
+	}
+
+	stats, statsErr := u.repo.ShortUrlAccessStats(uri.ShortId)
+	if statsErr != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"errorMessage": statsErr.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"id":          uri.ShortId,
+		"shortIdUri":  u.repo.Find(uri.ShortId),
+		"accessCount": stats.Count,
 	})
 }

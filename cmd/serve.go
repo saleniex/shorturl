@@ -33,10 +33,16 @@ func (sc ServeCmd) Exec(_ *cobra.Command, _ []string) {
 	engine.Use(ginzap.Ginzap(sc.logger, time.RFC3339, true))
 	engine.Use(ginzap.RecoveryWithZap(sc.logger, true))
 
-	handler.HandleIndex(engine)
-	handler.HandleAddUrl(engine, sc.repo, contextAuth, shorturl.NewSimpleIdGenerator())
-	handler.HandleViewUrl(engine, sc.repo)
-	handler.HandleRedirect(engine, sc.repo)
+	engine.GET("/", handler.Index{}.Handle)
+
+	redirectHandler := handler.NewRedirect(sc.repo)
+	engine.GET("/go/:id", redirectHandler.Handle)
+
+	viewHandler := handler.NewViewUrl(sc.repo)
+	engine.GET("/view/:id", viewHandler.Handle)
+
+	addUrlHandler := handler.NewAddUrl(sc.repo, contextAuth, shorturl.NewSimpleIdGenerator())
+	engine.POST("/", addUrlHandler.Handle)
 
 	listenAddr := sc.params.GetWithDefault(params.ListenAddr, ":8080")
 	if err := engine.Run(listenAddr); err != nil {
