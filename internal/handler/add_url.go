@@ -11,7 +11,7 @@ import (
 //
 // Content type is expected to be "application/json" while body contains JSON object with two parameters:
 // "url" and "shortId"
-func HandleAddUrl(engine *gin.Engine, urlRepo shorturl.Repo, auth auth.ContextAuth) {
+func HandleAddUrl(engine *gin.Engine, urlRepo shorturl.Repo, auth auth.ContextAuth, idGen shorturl.IdGenerator) {
 	engine.POST("/", func(context *gin.Context) {
 		if err := auth.Authorize(context); err != nil {
 			context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
@@ -27,6 +27,10 @@ func HandleAddUrl(engine *gin.Engine, urlRepo shorturl.Repo, auth auth.ContextAu
 			return
 		}
 
+		if shortUrl.ShortId == "" {
+			shortUrl.ShortId = idGen.Generate()
+		}
+
 		if err := urlRepo.StoreUrl(shortUrl); err != nil {
 			context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"errorMessage": "cannot store url " + err.Error(),
@@ -34,6 +38,9 @@ func HandleAddUrl(engine *gin.Engine, urlRepo shorturl.Repo, auth auth.ContextAu
 			return
 		}
 
-		context.Status(http.StatusCreated)
+		context.JSON(http.StatusCreated, gin.H{
+			"id":         shortUrl.ShortId,
+			"shortIdUri": shortUrl.Url,
+		})
 	})
 }

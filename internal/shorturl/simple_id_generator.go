@@ -13,9 +13,9 @@ type SimpleIdGenerator struct {
 
 var materia = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789"
 
-func NewSimpleIdGenerator() SimpleIdGenerator {
-	return SimpleIdGenerator{
-		Len: 8,
+func NewSimpleIdGenerator() *SimpleIdGenerator {
+	return &SimpleIdGenerator{
+		Len: 5,
 	}
 }
 

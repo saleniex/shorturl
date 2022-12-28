@@ -34,7 +34,7 @@ func (sc ServeCmd) Exec(_ *cobra.Command, _ []string) {
 	engine.Use(ginzap.RecoveryWithZap(sc.logger, true))
 
 	handler.HandleIndex(engine)
-	handler.HandleAddUrl(engine, sc.repo, contextAuth)
+	handler.HandleAddUrl(engine, sc.repo, contextAuth, shorturl.NewSimpleIdGenerator())
 	handler.HandleViewUrl(engine, sc.repo)
 	handler.HandleRedirect(engine, sc.repo)
 
