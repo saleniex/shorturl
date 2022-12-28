@@ -103,6 +103,8 @@ Redirects to respective URL
 - `GIN_MODE` Default is debug mode. For production environment set to `release`
 - `SHARED_TOKEN` Shared token for authentication
 - `REDIS_HOST` Redis host along with port number (localhost:6379). Relevant for repositories `REDIS`, `CACHED_MYSQL`.
+- `AMQP_URL` AMQP endpoint (e.g. amqp://localhost:5762)
+- `AMQP_QUEUE_NAME` AMQP queue name (default "shorturl_stats")
 
 ## Tests
 
