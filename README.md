@@ -17,4 +17,4 @@ Application is implemented with CLI and can be called in two modes:
 - Database initialization
 - ~~Redis cache~~
 - ~~New URL add and redirect stats via RabbitMQ~~
-- Auto ID generation
+- ~~Auto ID generation~~
