@@ -7,6 +7,7 @@ import (
 	"shorturl/internal/amqp"
 	"shorturl/internal/params"
 	"shorturl/internal/shorturl"
+	"time"
 )
 
 type ConsumeStatsCmd struct {
@@ -30,13 +31,23 @@ func (csc ConsumeStatsCmd) Exec(_ *cobra.Command, _ []string) {
 	queue := amqp.NewQueue(channel, csc.params.GetWithDefault("AMQP_QUEUE_NAME", defaultQueueName))
 
 	var forever chan struct{}
+	failCount := 0
+	maxFailCount := 5
 
-	if err := queue.Consume(csc.consumeCallback); err != nil {
-		csc.logger.Error("cannot start stats consumer", zap.Error(err))
-		return
+	for {
+		err := queue.Consume(csc.consumeCallback)
+		if err == nil {
+			<-forever
+		} else {
+			csc.logger.Error("Cannot start stats consumer.", zap.Error(err))
+			failCount++
+			if failCount > maxFailCount {
+				csc.logger.Error("Consumer start failed. Backing off.")
+				return
+			}
+			time.Sleep(3 * time.Second)
+		}
 	}
-
-	<-forever
 }
 
 // consumeCallback process incoming message
